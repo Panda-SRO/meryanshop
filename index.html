@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeryanShop | Perfumes originales</title>
+<meta name="description" content="MeryanShop: perfumes originales bajo pedido. Recomendador inteligente, catálogo y pedidos por WhatsApp, con precios en dólares, pesos dominicanos y pesos chilenos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #1b1420;
+    --bg-panel: #241c2c;
+    --bg-panel-alt: #2e2333;
+    --ink: #f3eae0;
+    --ink-dim: #c9bdc9;
+    --ink-faint: #9a8ea0;
+    --gold: #c9a227;
+    --gold-bright: #e0bc4a;
+    --gold-soft: rgba(201,162,39,0.14);
+    --rose: #a8677b;
+    --line: rgba(243,234,224,0.12);
+    --serif: 'Fraunces', serif;
+    --sans: 'Manrope', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  img,svg{display:block;max-width:100%;}
+  a{color:inherit;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+  h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:-0.01em;margin:0;}
+  p{margin:0;}
+  .section-label{
+    font-family:var(--sans);
+    font-size:13px;
+    color:var(--gold);
+    font-weight:700;
+    margin-bottom:10px;
+  }
+  ::selection{background:var(--gold-soft);color:var(--ink);}
+  :focus-visible{outline:2px solid var(--gold-bright);outline-offset:3px;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important;transition-duration:0.001ms !important;}
+  }
+
+  /* ---------- Nav ---------- */
+  header{
+    position:sticky;top:0;z-index:40;
+    background:rgba(27,20,32,0.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 0;gap:24px;
+  }
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+  .brand span{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--ink);}
+  .brand span em{font-style:normal;color:var(--gold-bright);}
+  .nav-links{display:flex;gap:28px;font-size:14.5px;color:var(--ink-dim);}
+  .nav-links a{text-decoration:none;padding:6px 0;border-bottom:1px solid transparent;}
+  .nav-links a:hover{color:var(--ink);border-color:var(--gold);}
+  .currency-pill{
+    display:flex;background:var(--bg-panel-alt);border:1px solid var(--line);
+    border-radius:999px;padding:4px;gap:2px;
+  }
+  .currency-pill button{
+    border:none;background:transparent;color:var(--ink-faint);
+    font-family:var(--sans);font-size:13px;font-weight:700;
+    padding:7px 13px;border-radius:999px;cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .currency-pill button.active{background:var(--gold);color:#241b0c;}
+  .nav-toggle{display:none;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:88px 0 96px;
+    display:grid;grid-template-columns:1.1fr 0.9fr;gap:48px;align-items:center;
+  }
+  .hero-eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:13px;color:var(--gold-bright);font-weight:700;
+    margin-bottom:22px;
+  }
+  .hero-eyebrow::before{content:"";width:22px;height:1px;background:var(--gold);display:inline-block;}
+  .hero h1{
+    font-size:clamp(38px,5vw,58px);
+    line-height:1.05;
+    max-width:14ch;
+  }
+  .hero h1 .accent{color:var(--gold-bright);}
+  .hero p.lead{
+    margin-top:22px;
+    font-size:18px;color:var(--ink-dim);max-width:46ch;
+  }
+  .hero-ctas{display:flex;gap:14px;margin-top:34px;flex-wrap:wrap;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:14px 24px;border-radius:8px;
+    font-family:var(--sans);font-weight:700;font-size:15px;
+    text-decoration:none;border:1px solid transparent;cursor:pointer;
+    transition:transform .15s ease, background .15s ease;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-gold{background:var(--gold);color:#241b0c;}
+  .btn-gold:hover{background:var(--gold-bright);}
+  .btn-ghost{background:transparent;border-color:var(--line);color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--gold);}
+  .hero-stats{display:flex;gap:28px;margin-top:44px;flex-wrap:wrap;}
+  .hero-stats div{font-size:13.5px;color:var(--ink-faint);}
+  .hero-stats strong{display:block;font-family:var(--serif);font-size:24px;color:var(--ink);font-weight:600;}
+
+  .hero-art{position:relative;display:flex;justify-content:center;}
+  .hero-art svg{width:100%;max-width:340px;}
+
+  /* ---------- Generic section ---------- */
+  section{padding:84px 0;border-top:1px solid var(--line);}
+  .section-head{max-width:56ch;margin-bottom:44px;}
+  .section-head h2{font-size:clamp(26px,3.4vw,36px);}
+  .section-head p{margin-top:14px;color:var(--ink-dim);font-size:16px;}
+
+  /* ---------- Recommender ---------- */
+  .rec-grid{display:grid;grid-template-columns:1.3fr 0.9fr;gap:40px;align-items:start;}
+  .rec-step{margin-bottom:30px;}
+  .rec-step-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;}
+  .rec-step-num{
+    font-family:var(--serif);color:var(--gold-bright);font-size:15px;font-weight:600;
+  }
+  .rec-step-title{font-size:15.5px;font-weight:700;color:var(--ink);}
+  .chip-row{display:flex;flex-wrap:wrap;gap:10px;}
+  .chip{
+    padding:10px 16px;border-radius:999px;border:1px solid var(--line);
+    background:var(--bg-panel);color:var(--ink-dim);font-size:14px;font-weight:600;
+    cursor:pointer;transition:border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .chip:hover{border-color:var(--gold);color:var(--ink);}
+  .chip.selected{background:var(--gold-soft);border-color:var(--gold);color:var(--gold-bright);}
+
+  .rec-summary{
+    position:sticky;top:96px;
+    background:var(--bg-panel);border:1px solid var(--line);border-radius:14px;
+    padding:28px;
+  }
+  .rec-summary h3{font-size:19px;margin-bottom:6px;}
+  .rec-summary p{color:var(--ink-faint);font-size:14px;margin-bottom:18px;}
+  .rec-summary-list{list-style:none;margin:0 0 22px;padding:0;display:flex;flex-direction:column;gap:8px;}
+  .rec-summary-list li{
+    font-size:14px;color:var(--ink-dim);display:flex;justify-content:space-between;
+    border-bottom:1px dashed var(--line);padding-bottom:8px;
+  }
+  .rec-summary-list li span:last-child{color:var(--ink);font-weight:600;}
+  .rec-summary .btn{width:100%;justify-content:center;}
+
+  /* ---------- Featured strip ---------- */
+  .strip-scroll{
+    display:flex;gap:22px;overflow-x:auto;padding:8px 4px 20px;margin:0 -4px;
+    scrollbar-width:thin;
+  }
+  .strip-scroll::-webkit-scrollbar{height:6px;}
+  .strip-scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
+  .p-card{
+    flex:0 0 220px;background:var(--bg-panel);border:1px solid var(--line);
+    border-radius:12px;padding:20px;
+  }
+  .p-card:nth-child(even){margin-top:22px;}
+  .p-bottle{width:64px;height:86px;margin-bottom:16px;}
+  .p-photo{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;margin-bottom:16px;}
+  .p-name{font-family:var(--serif);font-size:17px;font-weight:600;margin-bottom:4px;}
+  .p-tag{font-size:12px;color:var(--gold-bright);font-weight:700;margin-bottom:12px;display:block;}
+  .p-price{font-size:15px;font-weight:800;color:var(--ink);}
+  .p-price small{color:var(--ink-faint);font-weight:600;font-size:11.5px;}
+
+  /* ---------- Trust features ---------- */
+  .feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .feat{background:var(--bg-panel);padding:28px 22px;}
+  .feat-mark{font-family:var(--serif);font-size:22px;color:var(--gold-bright);margin-bottom:14px;}
+  .feat h3{font-size:16px;margin-bottom:8px;}
+  .feat p{font-size:13.5px;color:var(--ink-faint);}
+
+  /* ---------- Steps ---------- */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;}
+  .step{position:relative;padding-left:46px;}
+  .step-num{
+    position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;
+    border:1px solid var(--gold);color:var(--gold-bright);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--serif);font-size:14px;font-weight:600;
+  }
+  .step h3{font-size:16.5px;margin-bottom:8px;}
+  .step p{font-size:14px;color:var(--ink-dim);}
+
+  /* ---------- Catalog ---------- */
+  .cat-controls{display:flex;gap:14px;margin-bottom:26px;flex-wrap:wrap;}
+  .cat-search{
+    flex:1;min-width:220px;background:var(--bg-panel);border:1px solid var(--line);
+    border-radius:8px;padding:13px 16px;color:var(--ink);font-family:var(--sans);font-size:14.5px;
+  }
+  .cat-search::placeholder{color:var(--ink-faint);}
+  .cat-filter{
+    background:var(--bg-panel);border:1px solid var(--line);border-radius:8px;
+    padding:13px 16px;color:var(--ink-dim);font-family:var(--sans);font-size:14.5px;
+  }
+  .cat-list{border-top:1px solid var(--line);}
+  .cat-row{
+    display:grid;grid-template-columns:40px 1fr auto auto;gap:18px;align-items:center;
+    padding:16px 4px;border-bottom:1px solid var(--line);
+  }
+  .cat-row .p-bottle{width:28px;height:38px;margin:0;}
+  .cat-row-photo{width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;}
+  .cat-row-name{font-size:15px;font-weight:700;}
+  .cat-row-tag{font-size:12px;color:var(--ink-faint);}
+  .cat-row-price{font-size:14.5px;font-weight:800;white-space:nowrap;}
+  .cat-row-wa{
+    width:36px;height:36px;border-radius:50%;background:var(--gold-soft);
+    display:flex;align-items:center;justify-content:center;color:var(--gold-bright);
+    text-decoration:none;flex-shrink:0;
+  }
+  .cat-empty{padding:40px 4px;text-align:center;color:var(--ink-faint);font-size:14px;}
+  .cat-count{font-size:13px;color:var(--ink-faint);margin-top:14px;}
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--bg-panel);border-top:1px solid var(--line);padding:64px 0 28px;position:relative;overflow:hidden;}
+  .foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:40px;position:relative;z-index:1;}
+  .foot-brand svg{width:44px;height:44px;margin-bottom:16px;}
+  .foot-brand p{color:var(--ink-faint);font-size:14px;max-width:34ch;margin-top:10px;}
+  footer h4{font-size:13px;color:var(--ink);margin-bottom:16px;letter-spacing:0.02em;}
+  footer ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;}
+  footer a{text-decoration:none;color:var(--ink-faint);font-size:14px;}
+  footer a:hover{color:var(--gold-bright);}
+  .foot-bottom{
+    margin-top:56px;padding-top:22px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;color:var(--ink-faint);font-size:12.5px;flex-wrap:wrap;gap:10px;
+    position:relative;z-index:1;
+  }
+  .foot-watermark{
+    position:absolute;right:-40px;bottom:-60px;opacity:0.05;width:340px;z-index:0;
+  }
+
+  @media (max-width: 880px){
+    .nav-links{display:none;}
+    .hero{grid-template-columns:1fr;padding-top:56px;}
+    .hero-art{order:-1;}
+    .rec-grid{grid-template-columns:1fr;}
+    .rec-summary{position:static;}
+    .feat-grid{grid-template-columns:1fr 1fr;}
+    .steps{grid-template-columns:1fr;}
+    .foot-grid{grid-template-columns:1fr;}
+    .cat-row{grid-template-columns:32px 1fr auto;}
+    .cat-row-wa{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="#inicio" class="brand" id="logo-top"></a>
+    <nav class="nav-links">
+      <a href="#recomendador">Recomendador</a>
+      <a href="#destacados">Destacados</a>
+      <a href="#como-pedir">Cómo pedir</a>
+      <a href="#catalogo">Catálogo</a>
+    </nav>
+    <div class="currency-pill" id="currency-pill">
+      <button data-cur="USD" class="active">USD</button>
+      <button data-cur="DOP">RD$</button>
+      <button data-cur="CLP">CLP$</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section id="inicio" style="border-top:none;">
+    <div class="wrap hero">
+      <div>
+        <div class="hero-eyebrow">Catálogo 2026</div>
+        <h1>Un aroma para <span class="accent">cada versión</span> de ti.</h1>
+        <p class="lead">Perfumes originales bajo pedido, elegidos con un recomendador a tu medida y confirmados directo por WhatsApp — sin vueltas.</p>
+        <div class="hero-ctas">
+          <a href="#recomendador" class="btn btn-gold">Usar recomendador</a>
+          <a href="#catalogo" class="btn btn-ghost">Ver catálogo</a>
+        </div>
+        <div class="hero-stats">
+          <div><strong>+30</strong>fragancias activas</div>
+          <div><strong>3</strong>monedas de referencia</div>
+          <div><strong>1–2 días</strong>de coordinación de entrega</div>
+        </div>
+      </div>
+      <div class="hero-art">
+        <svg viewBox="0 0 220 320" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <line x1="70" y1="18" x2="70" y2="46" stroke="#c9a227" stroke-width="1.5" opacity="0.6"/>
+          <line x1="150" y1="10" x2="150" y2="42" stroke="#c9a227" stroke-width="1.5" opacity="0.4"/>
+          <line x1="110" y1="0" x2="110" y2="30" stroke="#c9a227" stroke-width="1.5" opacity="0.8"/>
+          <rect x="92" y="46" width="36" height="18" rx="4" fill="#3a2c44" stroke="#c9a227" stroke-width="1.5"/>
+          <path d="M84 64 h52 l6 22 H78 Z" fill="#2e2333" stroke="#c9a227" stroke-width="1.5"/>
+          <rect x="62" y="86" width="96" height="200" rx="16" fill="#241c2c" stroke="#c9a227" stroke-width="1.5"/>
+          <rect x="62" y="86" width="96" height="200" rx="16" fill="url(#glow)"/>
+          <text x="110" y="200" text-anchor="middle" font-family="Fraunces, serif" font-size="20" letter-spacing="-1" fill="#e0bc4a" font-weight="600">M&amp;A</text>
+          <line x1="78" y1="220" x2="142" y2="220" stroke="#c9a227" stroke-width="1" opacity="0.5"/>
+          <text x="110" y="240" text-anchor="middle" font-family="Manrope, sans-serif" font-size="9" letter-spacing="2" fill="#9a8ea0">MERYANSHOP</text>
+          <defs>
+            <linearGradient id="glow" x1="62" y1="86" x2="158" y2="286" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#c9a227" stop-opacity="0.18"/>
+              <stop offset="1" stop-color="#c9a227" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECOMENDADOR -->
+  <section id="recomendador">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">Recomendador personalizado</div>
+        <h2>Cuéntanos qué buscas</h2>
+        <p>Elige tus respuestas y arma el mensaje de recomendación. Lo enviamos directo por WhatsApp para confirmar opciones, precio y disponibilidad.</p>
+      </div>
+
+      <div class="rec-grid">
+        <div>
+          <div class="rec-step">
+            <div class="rec-step-head"><span class="rec-step-num">01</span><span class="rec-step-title">¿Para quién es?</span></div>
+            <div class="chip-row" data-group="quien">
+              <button class="chip">Hombre</button>
+              <button class="chip">Mujer</button>
+              <button class="chip">Unisex</button>
+            </div>
+          </div>
+          <div class="rec-step">
+            <div class="rec-step-head"><span class="rec-step-num">02</span><span class="rec-step-title">¿Para qué ocasión?</span></div>
+            <div class="chip-row" data-group="ocasion">
+              <button class="chip">Uso diario</button>
+              <button class="chip">Oficina</button>
+              <button class="chip">Citas</button>
+              <button class="chip">Fiestas</button>
+              <button class="chip">Regalo</button>
+            </div>
+          </div>
+          <div class="rec-step">
+            <div class="rec-step-head"><span class="rec-step-num">03</span><span class="rec-step-title">¿Qué estilo prefieres?</span></div>
+            <div class="chip-row" data-group="estilo">
+              <button class="chip">Fresco</button>
+              <button class="chip">Dulce</button>
+              <button class="chip">Elegante</button>
+              <button class="chip">Intenso</button>
+              <button class="chip">Amaderado</button>
+              <button class="chip">Árabe</button>
+            </div>
+          </div>
+          <div class="rec-step">
+            <div class="rec-step-head"><span class="rec-step-num">04</span><span class="rec-step-title">¿Cuál es tu presupuesto?</span></div>
+            <div class="chip-row" data-group="presupuesto">
+              <button class="chip">Económico</button>
+              <button class="chip">Medio</button>
+              <button class="chip">Alto</button>
+              <button class="chip">Sin límite</button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="rec-summary">
+          <h3>Tu selección</h3>
+          <p>Se actualiza mientras eliges arriba.</p>
+          <ul class="rec-summary-list" id="rec-summary-list">
+            <li><span>Para quién</span><span id="rs-quien">—</span></li>
+            <li><span>Ocasión</span><span id="rs-ocasion">—</span></li>
+            <li><span>Estilo</span><span id="rs-estilo">—</span></li>
+            <li><span>Presupuesto</span><span id="rs-presupuesto">—</span></li>
+          </ul>
+          <a href="#" id="rec-whatsapp" class="btn btn-gold" target="_blank" rel="noopener">Pedir recomendación por WhatsApp</a>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- DESTACADOS -->
+  <section id="destacados">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">Selección de hoy</div>
+        <h2>Fragancias destacadas</h2>
+        <p>Seis fragancias distintas, elegidas del catálogo. La selección cambia cada día.</p>
+      </div>
+      <div class="strip-scroll" id="featured-strip"></div>
+    </div>
+  </section>
+
+  <!-- CONFIANZA -->
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">Compra con confianza</div>
+        <h2>Una experiencia simple y cuidada</h2>
+      </div>
+      <div class="feat-grid">
+        <div class="feat"><div class="feat-mark">✦</div><h3>Fragancias originales</h3><p>Trabajamos bajo pedido con productos originales.</p></div>
+        <div class="feat"><div class="feat-mark">▣</div><h3>Empaque cuidado</h3><p>Preparamos cada pedido para que llegue en perfectas condiciones.</p></div>
+        <div class="feat"><div class="feat-mark">↗</div><h3>Coordinación de envío</h3><p>Coordinamos la entrega contigo según tu zona.</p></div>
+        <div class="feat"><div class="feat-mark">●</div><h3>Atención directa</h3><p>Hablas con MeryanShop directamente, sin intermediarios.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMO PEDIR -->
+  <section id="como-pedir">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">Compra fácil</div>
+        <h2>Cómo pedir</h2>
+        <p>Tu pedido se confirma directo por WhatsApp, sin pasos adicionales.</p>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><h3>Encuentra tu perfume</h3><p>Usa el recomendador o busca directamente en el catálogo.</p></div>
+        <div class="step"><div class="step-num">2</div><h3>Escríbenos</h3><p>Cada perfume tiene acceso directo a WhatsApp para consultar.</p></div>
+        <div class="step"><div class="step-num">3</div><h3>Recibe tu pedido</h3><p>Confirmamos precio, disponibilidad y coordinamos la entrega.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATALOGO -->
+  <section id="catalogo">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-label">Catálogo por perfume</div>
+        <h2>Busca entre todas las fragancias</h2>
+        <p>Filtra por nombre o por categoría. Los precios se actualizan según la moneda elegida arriba.</p>
+      </div>
+      <div class="cat-controls">
+        <input type="text" class="cat-search" id="cat-search" placeholder="Buscar por nombre...">
+        <select class="cat-filter" id="cat-filter">
+          <option value="Todos">Todos</option>
+          <option value="Hombre">Hombre</option>
+          <option value="Mujer">Mujer</option>
+          <option value="Unisex">Unisex</option>
+        </select>
+      </div>
+      <div class="cat-list" id="cat-list"></div>
+      <p class="cat-count" id="cat-count"></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <svg class="foot-watermark" viewBox="0 0 220 320" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="62" y="86" width="96" height="200" rx="16" fill="none" stroke="#c9a227" stroke-width="2"/>
+    <text x="110" y="215" text-anchor="middle" font-family="Fraunces, serif" font-size="46" letter-spacing="-1" fill="#c9a227" font-weight="600">M&amp;A</text>
+  </svg>
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="32" cy="32" r="31" fill="#241c2c" stroke="#c9a227" stroke-width="1.5"/>
+        <text x="32" y="38" text-anchor="middle" font-family="Fraunces, serif" font-size="18" letter-spacing="-0.5" fill="#e0bc4a" font-weight="600">M&amp;A</text>
+      </svg>
+      <h4 style="font-family:var(--serif);font-size:19px;color:var(--ink);">MeryanShop</h4>
+      <p>Perfumes originales bajo pedido. Recomendador, catálogo y pedidos directos por WhatsApp.</p>
+    </div>
+    <div>
+      <h4>Explorar</h4>
+      <ul>
+        <li><a href="#recomendador">Recomendador</a></li>
+        <li><a href="#destacados">Destacados</a></li>
+        <li><a href="#catalogo">Catálogo</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contacto</h4>
+      <ul>
+        <li><a href="https://wa.me/18496548098" id="footer-whatsapp" target="_blank" rel="noopener">WhatsApp</a></li>
+        <li><a href="#como-pedir">Cómo pedir</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap foot-bottom">
+    <span>© 2026 MeryanShop. Todos los derechos reservados.</span>
+    <span>Precios de referencia — se confirman al momento del pedido.</span>
+  </div>
+</footer>
+
+<script>
+/* ================= LOGO (nav) ================= */
+document.getElementById('logo-top').innerHTML = `
+  <svg width="34" height="34" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="32" cy="32" r="31" fill="#241c2c" stroke="#c9a227" stroke-width="1.5"/>
+    <text x="32" y="38" text-anchor="middle" font-family="Fraunces, serif" font-size="18" letter-spacing="-0.5" fill="#e0bc4a" font-weight="600">M&amp;A</text>
+  </svg>
+  <span>Meryan<em>Shop</em></span>
+`;
+
+/* ================= DATA ================= */
+// Precio base en USD. Ajusta estos valores y agrega tantos productos como necesites.
+const PRODUCTS = [
+  {name:"Ámbar Nocturno", cat:"Hombre", tag:"Amaderado", usd:42},
+  {name:"Brisa Cítrica", cat:"Hombre", tag:"Fresco", usd:35},
+  {name:"Oud Imperial", cat:"Hombre", tag:"Árabe", usd:58},
+  {name:"Cedro Real", cat:"Hombre", tag:"Intenso", usd:46},
+  {name:"Flor de Tuberosa", cat:"Mujer", tag:"Dulce", usd:44},
+  {name:"Vainilla Negra", cat:"Mujer", tag:"Dulce", usd:39},
+  {name:"Rosa de Medianoche", cat:"Mujer", tag:"Elegante", usd:52},
+  {name:"Jazmín Blanco", cat:"Mujer", tag:"Fresco", usd:37},
+  {name:"Almizcle Dorado", cat:"Unisex", tag:"Elegante", usd:48},
+  {name:"Sal y Sándalo", cat:"Unisex", tag:"Amaderado", usd:41},
+  {name:"Incienso Árabe", cat:"Unisex", tag:"Árabe", usd:55},
+  {name:"Higuera Verde", cat:"Unisex", tag:"Fresco", usd:33},
+  {name:"Cuero y Tabaco", cat:"Hombre", tag:"Intenso", usd:50},
+  {name:"Pétalo de Seda", cat:"Mujer", tag:"Elegante", usd:47},
+  {name:"Bergamota Real", cat:"Unisex", tag:"Fresco", usd:36},
+];
+// Cada producto puede traer su propia foto: agrega  img: "assets/img/mi-foto.jpg"
+// dentro del objeto del producto. Si no la agregas, se usa una imagen de
+// referencia según el estilo (assets/img/placeholder-<estilo>.jpg).
+function slugTag(tag){
+  return tag.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+function imageFor(p){
+  return p.img || `assets/img/placeholder-${slugTag(p.tag)}.svg`;
+}
+
+// Tasas de referencia (aproximadas). Actualízalas antes de publicar.
+const RATES = { USD: 1, DOP: 60, CLP: 950 };
+const SYMBOLS = { USD: "US$", DOP: "RD$", CLP: "CLP$" };
+let currentCurrency = "USD";
+
+// Número de WhatsApp según la moneda seleccionada.
+const WA_NUMBERS = { USD: "18496548098", DOP: "18496548098", CLP: "56991565317" };
+function getWaNumber(){ return WA_NUMBERS[currentCurrency]; }
+
+function formatPrice(usd){
+  const value = usd * RATES[currentCurrency];
+  const rounded = currentCurrency === "USD" ? value.toFixed(2) : Math.round(value).toLocaleString('es-DO');
+  return `${SYMBOLS[currentCurrency]} ${rounded}`;
+}
+
+/* ================= CURRENCY SWITCH ================= */
+document.getElementById('currency-pill').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-cur]');
+  if(!btn) return;
+  currentCurrency = btn.dataset.cur;
+  document.querySelectorAll('#currency-pill button').forEach(b=>b.classList.toggle('active', b===btn));
+  renderFeatured();
+  renderCatalog();
+  updateWhatsappLink();
+  updateFooterWhatsapp();
+});
+
+/* ================= FEATURED (rota por día) ================= */
+function seededPick(list, n, seed){
+  const arr = [...list];
+  let s = seed;
+  for(let i=arr.length-1;i>0;i--){
+    s = (s * 9301 + 49297) % 233280;
+    const j = Math.floor((s/233280) * (i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr.slice(0,n);
+}
+function renderFeatured(){
+  const dayNum = Math.floor(Date.now() / 86400000);
+  const picks = seededPick(PRODUCTS, 6, dayNum);
+  document.getElementById('featured-strip').innerHTML = picks.map((p)=>`
+    <div class="p-card">
+      <img class="p-photo" src="${imageFor(p)}" alt="${p.name}" loading="lazy">
+      <span class="p-tag">${p.tag}</span>
+      <div class="p-name">${p.name}</div>
+      <div class="p-price">${formatPrice(p.usd)} <small>${p.cat}</small></div>
+    </div>
+  `).join('');
+}
+
+/* ================= CATALOG ================= */
+function renderCatalog(){
+  const q = document.getElementById('cat-search').value.trim().toLowerCase();
+  const filter = document.getElementById('cat-filter').value;
+  const list = PRODUCTS.filter(p=>{
+    const matchesQ = p.name.toLowerCase().includes(q);
+    const matchesF = filter === "Todos" || p.cat === filter;
+    return matchesQ && matchesF;
+  });
+  const listEl = document.getElementById('cat-list');
+  if(list.length === 0){
+    listEl.innerHTML = `<div class="cat-empty">No encontramos perfumes con ese filtro. Intenta con otro nombre.</div>`;
+  } else {
+    listEl.innerHTML = list.map((p)=>`
+      <div class="cat-row">
+        <img class="cat-row-photo" src="${imageFor(p)}" alt="${p.name}" loading="lazy">
+        <div>
+          <div class="cat-row-name">${p.name}</div>
+          <div class="cat-row-tag">${p.cat} · ${p.tag}</div>
+        </div>
+        <div class="cat-row-price">${formatPrice(p.usd)}</div>
+        <a class="cat-row-wa" href="https://wa.me/${getWaNumber()}?text=${encodeURIComponent('Hola MeryanShop, me interesa: ' + p.name)}" target="_blank" rel="noopener" aria-label="Preguntar por WhatsApp">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.35 5.08L2 22l5.1-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.19-3.03.8.81-2.95-.2-.31A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z"/></svg>
+        </a>
+      </div>
+    `).join('');
+  }
+  document.getElementById('cat-count').textContent = `${list.length} de ${PRODUCTS.length} fragancias mostradas.`;
+}
+document.getElementById('cat-search').addEventListener('input', renderCatalog);
+document.getElementById('cat-filter').addEventListener('change', renderCatalog);
+
+/* ================= RECOMMENDER ================= */
+const selections = { quien:null, ocasion:null, estilo:null, presupuesto:null };
+const labelMap = { quien:'rs-quien', ocasion:'rs-ocasion', estilo:'rs-estilo', presupuesto:'rs-presupuesto' };
+
+document.querySelectorAll('.chip-row').forEach(row=>{
+  const group = row.dataset.group;
+  row.addEventListener('click', (e)=>{
+    const chip = e.target.closest('.chip');
+    if(!chip) return;
+    row.querySelectorAll('.chip').forEach(c=>c.classList.toggle('selected', c===chip));
+    selections[group] = chip.textContent;
+    document.getElementById(labelMap[group]).textContent = chip.textContent;
+    updateWhatsappLink();
+  });
+});
+
+function updateWhatsappLink(){
+  const parts = [];
+  if(selections.quien) parts.push(`Para: ${selections.quien}`);
+  if(selections.ocasion) parts.push(`Ocasión: ${selections.ocasion}`);
+  if(selections.estilo) parts.push(`Estilo: ${selections.estilo}`);
+  if(selections.presupuesto) parts.push(`Presupuesto: ${selections.presupuesto}`);
+  const base = "Hola MeryanShop, quiero una recomendación de perfume.";
+  const msg = parts.length ? `${base} ${parts.join(' · ')}` : base;
+  document.getElementById('rec-whatsapp').href = `https://wa.me/${getWaNumber()}?text=${encodeURIComponent(msg)}`;
+}
+function updateFooterWhatsapp(){
+  const el = document.getElementById('footer-whatsapp');
+  if(el) el.href = `https://wa.me/${getWaNumber()}`;
+}
+updateWhatsappLink();
+updateFooterWhatsapp();
+
+/* ================= INIT ================= */
+renderFeatured();
+renderCatalog();
+</script>
+</body>
+</html>

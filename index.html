@@ -171,7 +171,10 @@
   .p-card{
     flex:0 0 220px;background:var(--bg-panel);border:1px solid var(--line);
     border-radius:12px;padding:20px;
+    box-shadow:0 6px 22px rgba(0,0,0,0.22);
+    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
   }
+  .p-card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 12px 28px rgba(0,0,0,0.3);}
   .p-card:nth-child(even){margin-top:22px;}
   .p-bottle{width:64px;height:86px;margin-bottom:16px;}
   .p-photo{width:100%;aspect-ratio:1/1;border-radius:8px;margin-bottom:16px;background-color:var(--bg-panel-alt);}
@@ -210,23 +213,33 @@
     background:var(--bg-panel);border:1px solid var(--line);border-radius:8px;
     padding:13px 16px;color:var(--ink-dim);font-family:var(--sans);font-size:14.5px;
   }
-  .cat-list{border-top:1px solid var(--line);}
-  .cat-row{
-    display:grid;grid-template-columns:40px 1fr auto auto;gap:18px;align-items:center;
-    padding:16px 4px;border-bottom:1px solid var(--line);
+  .cat-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:24px;
   }
-  .cat-row .p-bottle{width:28px;height:38px;margin:0;}
-  .cat-row-photo{width:40px;height:40px;border-radius:6px;flex-shrink:0;background-color:var(--bg-panel-alt);}
-  .cat-row-name{font-size:15px;font-weight:700;}
-  .cat-row-tag{font-size:12px;color:var(--ink-faint);}
-  .cat-row-price{font-size:14.5px;font-weight:800;white-space:nowrap;}
-  .cat-row-wa{
-    width:36px;height:36px;border-radius:50%;background:var(--gold-soft);
-    display:flex;align-items:center;justify-content:center;color:var(--gold-bright);
-    text-decoration:none;flex-shrink:0;
+  .cat-card{
+    background:var(--bg-panel);border:1px solid var(--line);border-radius:14px;
+    padding:18px;display:flex;flex-direction:column;
+    box-shadow:0 6px 22px rgba(0,0,0,0.22);
+    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
   }
-  .cat-empty{padding:40px 4px;text-align:center;color:var(--ink-faint);font-size:14px;}
-  .cat-count{font-size:13px;color:var(--ink-faint);margin-top:14px;}
+  .cat-card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 12px 28px rgba(0,0,0,0.3);}
+  .cat-card-photo{
+    width:100%;aspect-ratio:1/1;border-radius:10px;margin-bottom:16px;
+    background-color:var(--bg-panel-alt);
+  }
+  .cat-card-tag{font-size:12px;color:var(--gold-bright);font-weight:700;margin-bottom:8px;display:block;}
+  .cat-card-name{font-family:var(--serif);font-size:17px;font-weight:600;margin-bottom:6px;line-height:1.28;}
+  .cat-card-meta{font-size:12.5px;color:var(--ink-faint);margin-bottom:16px;}
+  .cat-card-price{font-size:17px;font-weight:800;color:var(--ink);margin-top:auto;margin-bottom:14px;}
+  .cat-card-wa{
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px;border-radius:8px;background:var(--gold-soft);color:var(--gold-bright);
+    text-decoration:none;font-size:13.5px;font-weight:700;
+    transition:background .15s ease, color .15s ease;
+  }
+  .cat-card-wa:hover{background:var(--gold);color:#241b0c;}
+  .cat-empty{padding:50px 4px;text-align:center;color:var(--ink-faint);font-size:14.5px;grid-column:1/-1;}
+  .cat-count{font-size:13px;color:var(--ink-faint);margin-top:22px;}
 
   /* ---------- Footer ---------- */
   footer{background:var(--bg-panel);border-top:1px solid var(--line);padding:64px 0 28px;position:relative;overflow:hidden;}
@@ -436,18 +449,27 @@
       <div class="section-head">
         <div class="section-label">Catálogo por perfume</div>
         <h2>Busca entre todas las fragancias</h2>
-        <p>Filtra por nombre o por categoría. Los precios se actualizan según la moneda elegida arriba.</p>
+        <p>Filtra por nombre, categoría o estilo. Los precios se actualizan según la moneda elegida arriba.</p>
       </div>
       <div class="cat-controls">
         <input type="text" class="cat-search" id="cat-search" placeholder="Buscar por nombre...">
         <select class="cat-filter" id="cat-filter">
-          <option value="Todos">Todos</option>
+          <option value="Todos">Categoría: Todos</option>
           <option value="Hombre">Hombre</option>
           <option value="Mujer">Mujer</option>
           <option value="Unisex">Unisex</option>
         </select>
+        <select class="cat-filter" id="cat-tag-filter">
+          <option value="Todos">Estilo: Todos</option>
+          <option value="Fresco">Fresco</option>
+          <option value="Dulce">Dulce</option>
+          <option value="Elegante">Elegante</option>
+          <option value="Intenso">Intenso</option>
+          <option value="Amaderado">Amaderado</option>
+          <option value="Árabe">Árabe</option>
+        </select>
       </div>
-      <div class="cat-list" id="cat-list"></div>
+      <div class="cat-grid" id="cat-list"></div>
       <p class="cat-count" id="cat-count"></p>
     </div>
   </section>
@@ -598,25 +620,27 @@ function renderFeatured(){
 function renderCatalog(){
   const q = document.getElementById('cat-search').value.trim().toLowerCase();
   const filter = document.getElementById('cat-filter').value;
+  const tagFilter = document.getElementById('cat-tag-filter').value;
   const list = PRODUCTS.filter(p=>{
     const matchesQ = p.name.toLowerCase().includes(q);
     const matchesF = filter === "Todos" || p.cat === filter;
-    return matchesQ && matchesF;
+    const matchesTag = tagFilter === "Todos" || p.tag === tagFilter;
+    return matchesQ && matchesF && matchesTag;
   });
   const listEl = document.getElementById('cat-list');
   if(list.length === 0){
-    listEl.innerHTML = `<div class="cat-empty">No encontramos perfumes con ese filtro. Intenta con otro nombre.</div>`;
+    listEl.innerHTML = `<div class="cat-empty">No encontramos perfumes con ese filtro. Intenta con otro nombre o estilo.</div>`;
   } else {
     listEl.innerHTML = list.map((p)=>`
-      <div class="cat-row">
-        <div class="cat-row-photo" style="${photoStyle(p)}" role="img" aria-label="${p.name}"></div>
-        <div>
-          <div class="cat-row-name">${p.name}</div>
-          <div class="cat-row-tag">${p.cat} · ${p.tag}${p.size ? ' · ' + p.size : ''}</div>
-        </div>
-        <div class="cat-row-price">${formatPrice(p.dop)}</div>
-        <a class="cat-row-wa" href="https://wa.me/${getWaNumber()}?text=${encodeURIComponent('Hola MeryanShop, me interesa: ' + p.name)}" target="_blank" rel="noopener" aria-label="Preguntar por WhatsApp">
+      <div class="cat-card">
+        <div class="cat-card-photo" style="${photoStyle(p)}" role="img" aria-label="${p.name}"></div>
+        <span class="cat-card-tag">${p.tag}</span>
+        <div class="cat-card-name">${p.name}</div>
+        <div class="cat-card-meta">${p.cat}${p.size ? ' · ' + p.size : ''}</div>
+        <div class="cat-card-price">${formatPrice(p.dop)}</div>
+        <a class="cat-card-wa" href="https://wa.me/${getWaNumber()}?text=${encodeURIComponent('Hola MeryanShop, me interesa: ' + p.name)}" target="_blank" rel="noopener" aria-label="Preguntar por WhatsApp">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.35 5.08L2 22l5.1-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.19-3.03.8.81-2.95-.2-.31A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z"/></svg>
+          Pedir por WhatsApp
         </a>
       </div>
     `).join('');
@@ -625,6 +649,7 @@ function renderCatalog(){
 }
 document.getElementById('cat-search').addEventListener('input', renderCatalog);
 document.getElementById('cat-filter').addEventListener('change', renderCatalog);
+document.getElementById('cat-tag-filter').addEventListener('change', renderCatalog);
 
 /* ================= RECOMMENDER ================= */
 const selections = { quien:null, ocasion:null, estilo:null, presupuesto:null };
@@ -639,6 +664,22 @@ document.querySelectorAll('.chip-row').forEach(row=>{
     selections[group] = chip.textContent;
     document.getElementById(labelMap[group]).textContent = chip.textContent;
     updateWhatsappLink();
+
+    // El estilo y el "para quién" elegidos aquí también filtran el catálogo de abajo.
+    if(group === 'estilo'){
+      const tagFilter = document.getElementById('cat-tag-filter');
+      if([...tagFilter.options].some(o => o.value === chip.textContent)){
+        tagFilter.value = chip.textContent;
+        renderCatalog();
+      }
+    }
+    if(group === 'quien'){
+      const catFilter = document.getElementById('cat-filter');
+      if([...catFilter.options].some(o => o.value === chip.textContent)){
+        catFilter.value = chip.textContent;
+        renderCatalog();
+      }
+    }
   });
 });
 

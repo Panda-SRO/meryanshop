@@ -161,6 +161,21 @@
   .rec-summary-list li span:last-child{color:var(--ink);font-weight:600;}
   .rec-summary .btn{width:100%;justify-content:center;}
 
+  /* ---------- Recommender live results ---------- */
+  .reco-results{margin-top:44px;padding-top:36px;border-top:1px solid var(--line);}
+  .reco-results-head{
+    display:flex;justify-content:space-between;align-items:flex-end;gap:20px;
+    margin-bottom:26px;flex-wrap:wrap;
+  }
+  .reco-results-head h3{font-family:var(--serif);font-size:22px;font-weight:600;margin-bottom:6px;}
+  .reco-results-head p{color:var(--ink-faint);font-size:14px;}
+  .reco-clear{
+    background:transparent;border:1px solid var(--line);color:var(--ink-dim);
+    font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 16px;
+    border-radius:999px;cursor:pointer;transition:border-color .15s ease, color .15s ease;
+  }
+  .reco-clear:hover{border-color:var(--gold);color:var(--ink);}
+
   /* ---------- Featured strip ---------- */
   .strip-scroll{
     display:flex;gap:22px;overflow-x:auto;padding:8px 4px 20px;margin:0 -4px;
@@ -396,6 +411,17 @@
           <a href="#" id="rec-whatsapp" class="btn btn-gold" target="_blank" rel="noopener">Pedir recomendación por WhatsApp</a>
         </aside>
       </div>
+
+      <div class="reco-results" id="reco-results" hidden>
+        <div class="reco-results-head">
+          <div>
+            <h3 id="reco-results-title">Opciones que coinciden</h3>
+            <p id="reco-results-count"></p>
+          </div>
+          <button type="button" class="reco-clear" id="reco-clear">Limpiar selección</button>
+        </div>
+        <div class="cat-grid" id="reco-results-grid"></div>
+      </div>
     </div>
   </section>
 
@@ -617,6 +643,21 @@ function renderFeatured(){
 }
 
 /* ================= CATALOG ================= */
+function catalogCardHTML(p){
+  return `
+    <div class="cat-card">
+      <div class="cat-card-photo" style="${photoStyle(p)}" role="img" aria-label="${p.name}"></div>
+      <span class="cat-card-tag">${p.tag}</span>
+      <div class="cat-card-name">${p.name}</div>
+      <div class="cat-card-meta">${p.cat}${p.size ? ' · ' + p.size : ''}</div>
+      <div class="cat-card-price">${formatPrice(p.dop)}</div>
+      <a class="cat-card-wa" href="https://wa.me/${getWaNumber()}?text=${encodeURIComponent('Hola MeryanShop, me interesa: ' + p.name)}" target="_blank" rel="noopener" aria-label="Preguntar por WhatsApp">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.35 5.08L2 22l5.1-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.19-3.03.8.81-2.95-.2-.31A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z"/></svg>
+        Pedir por WhatsApp
+      </a>
+    </div>
+  `;
+}
 function renderCatalog(){
   const q = document.getElementById('cat-search').value.trim().toLowerCase();
   const filter = document.getElementById('cat-filter').value;
@@ -631,19 +672,7 @@ function renderCatalog(){
   if(list.length === 0){
     listEl.innerHTML = `<div class="cat-empty">No encontramos perfumes con ese filtro. Intenta con otro nombre o estilo.</div>`;
   } else {
-    listEl.innerHTML = list.map((p)=>`
-      <div class="cat-card">
-        <div class="cat-card-photo" style="${photoStyle(p)}" role="img" aria-label="${p.name}"></div>
-        <span class="cat-card-tag">${p.tag}</span>
-        <div class="cat-card-name">${p.name}</div>
-        <div class="cat-card-meta">${p.cat}${p.size ? ' · ' + p.size : ''}</div>
-        <div class="cat-card-price">${formatPrice(p.dop)}</div>
-        <a class="cat-card-wa" href="https://wa.me/${getWaNumber()}?text=${encodeURIComponent('Hola MeryanShop, me interesa: ' + p.name)}" target="_blank" rel="noopener" aria-label="Preguntar por WhatsApp">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.35 5.08L2 22l5.1-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.19-3.03.8.81-2.95-.2-.31A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z"/></svg>
-          Pedir por WhatsApp
-        </a>
-      </div>
-    `).join('');
+    listEl.innerHTML = list.map(catalogCardHTML).join('');
   }
   document.getElementById('cat-count').textContent = `${list.length} de ${PRODUCTS.length} fragancias mostradas.`;
 }
@@ -655,32 +684,89 @@ document.getElementById('cat-tag-filter').addEventListener('change', renderCatal
 const selections = { quien:null, ocasion:null, estilo:null, presupuesto:null };
 const labelMap = { quien:'rs-quien', ocasion:'rs-ocasion', estilo:'rs-estilo', presupuesto:'rs-presupuesto' };
 
+// Qué ocasiones encajan con cada estilo (los productos no traen ocasión propia).
+const OCCASIONS_BY_TAG = {
+  Fresco: ['Uso diario','Oficina'],
+  Elegante: ['Citas','Regalo','Oficina'],
+  Dulce: ['Citas','Fiestas','Regalo'],
+  Intenso: ['Fiestas','Citas'],
+  Amaderado: ['Oficina','Regalo'],
+  'Árabe': ['Regalo','Fiestas','Citas','Uso diario'],
+};
+const BUDGET_RANGES = {
+  'Económico': [0, 3500],
+  'Medio': [3501, 5000],
+  'Alto': [5001, 8000],
+  'Sin límite': [8001, Infinity],
+};
+
+function matchesSelections(p){
+  if(selections.quien && !(p.cat === selections.quien || p.cat === 'Unisex')) return false;
+  if(selections.estilo && p.tag !== selections.estilo) return false;
+  if(selections.ocasion){
+    const occasions = OCCASIONS_BY_TAG[p.tag] || [];
+    if(!occasions.includes(selections.ocasion)) return false;
+  }
+  if(selections.presupuesto){
+    const range = BUDGET_RANGES[selections.presupuesto];
+    if(range && (p.dop < range[0] || p.dop > range[1])) return false;
+  }
+  return true;
+}
+
+function renderRecoResults(){
+  const hasSelection = selections.quien || selections.ocasion || selections.estilo || selections.presupuesto;
+  const box = document.getElementById('reco-results');
+  const grid = document.getElementById('reco-results-grid');
+  const title = document.getElementById('reco-results-title');
+  const count = document.getElementById('reco-results-count');
+  if(!hasSelection){
+    box.hidden = true;
+    grid.innerHTML = '';
+    return;
+  }
+  box.hidden = false;
+  const matches = PRODUCTS.filter(matchesSelections);
+  if(matches.length === 0){
+    title.textContent = 'No encontramos una coincidencia exacta';
+    count.textContent = 'Prueba cambiando una preferencia o ampliando el presupuesto.';
+    grid.innerHTML = `<div class="cat-empty">Sin resultados para esta combinación. Prueba con otra opción.</div>`;
+    return;
+  }
+  const shown = matches.slice(0, 9);
+  title.textContent = 'Opciones que coinciden';
+  count.textContent = shown.length < matches.length
+    ? `${matches.length} fragancias encontradas · mostrando las primeras ${shown.length}.`
+    : `${matches.length} fragancia${matches.length === 1 ? '' : 's'} encontrada${matches.length === 1 ? '' : 's'}.`;
+  grid.innerHTML = shown.map(catalogCardHTML).join('');
+}
+
 document.querySelectorAll('.chip-row').forEach(row=>{
   const group = row.dataset.group;
   row.addEventListener('click', (e)=>{
     const chip = e.target.closest('.chip');
     if(!chip) return;
-    row.querySelectorAll('.chip').forEach(c=>c.classList.toggle('selected', c===chip));
-    selections[group] = chip.textContent;
-    document.getElementById(labelMap[group]).textContent = chip.textContent;
+    const alreadySelected = chip.classList.contains('selected');
+    row.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected'));
+    if(alreadySelected){
+      selections[group] = null;
+      document.getElementById(labelMap[group]).textContent = '—';
+    } else {
+      chip.classList.add('selected');
+      selections[group] = chip.textContent;
+      document.getElementById(labelMap[group]).textContent = chip.textContent;
+    }
     updateWhatsappLink();
-
-    // El estilo y el "para quién" elegidos aquí también filtran el catálogo de abajo.
-    if(group === 'estilo'){
-      const tagFilter = document.getElementById('cat-tag-filter');
-      if([...tagFilter.options].some(o => o.value === chip.textContent)){
-        tagFilter.value = chip.textContent;
-        renderCatalog();
-      }
-    }
-    if(group === 'quien'){
-      const catFilter = document.getElementById('cat-filter');
-      if([...catFilter.options].some(o => o.value === chip.textContent)){
-        catFilter.value = chip.textContent;
-        renderCatalog();
-      }
-    }
+    renderRecoResults();
   });
+});
+
+document.getElementById('reco-clear').addEventListener('click', ()=>{
+  Object.keys(selections).forEach(k => selections[k] = null);
+  document.querySelectorAll('.chip-row .chip').forEach(c => c.classList.remove('selected'));
+  Object.values(labelMap).forEach(id => document.getElementById(id).textContent = '—');
+  updateWhatsappLink();
+  renderRecoResults();
 });
 
 function updateWhatsappLink(){

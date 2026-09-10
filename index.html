@@ -26,6 +26,19 @@
     --serif: 'Fraunces', serif;
     --sans: 'Manrope', sans-serif;
   }
+  /* Zona clara: del recomendador hacia abajo (todo menos el hero y el nav) */
+  .light{
+    --bg: #faf9f6;
+    --bg-panel: #ffffff;
+    --bg-panel-alt: #f2ede4;
+    --ink: #241c2c;
+    --ink-dim: #5c5162;
+    --ink-faint: #8c8190;
+    --gold-bright: #9c7a1c;
+    --line: rgba(36,28,44,0.1);
+    background: var(--bg);
+    color: var(--ink);
+  }
   *{box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
@@ -216,7 +229,7 @@
   .p-photo, .cat-card-photo{position:relative;cursor:pointer;}
   .p-photo::after, .cat-card-photo::after{
     content:"Ver detalles";position:absolute;inset:auto 0 0 0;text-align:center;
-    background:linear-gradient(transparent, rgba(10,7,12,0.65));color:var(--ink);
+    background:linear-gradient(transparent, rgba(10,7,12,0.65));color:#f3eae0;
     font-size:12px;font-weight:700;padding:28px 8px 10px;opacity:0;
     transition:opacity .15s ease;border-radius:0 0 8px 8px;
   }
@@ -396,7 +409,7 @@
   </section>
 
   <!-- RECOMENDADOR -->
-  <section id="recomendador">
+  <section id="recomendador" class="light">
     <div class="wrap">
       <div class="section-head">
         <div class="section-label">Recomendador personalizado</div>
@@ -473,7 +486,7 @@
   </section>
 
   <!-- DESTACADOS -->
-  <section id="destacados">
+  <section id="destacados" class="light">
     <div class="wrap">
       <div class="section-head">
         <div class="section-label">Selección de hoy</div>
@@ -485,7 +498,7 @@
   </section>
 
   <!-- CONFIANZA -->
-  <section>
+  <section class="light">
     <div class="wrap">
       <div class="section-head">
         <div class="section-label">Compra con confianza</div>
@@ -501,7 +514,7 @@
   </section>
 
   <!-- COMO PEDIR -->
-  <section id="como-pedir">
+  <section id="como-pedir" class="light">
     <div class="wrap">
       <div class="section-head">
         <div class="section-label">Compra fácil</div>
@@ -517,7 +530,7 @@
   </section>
 
   <!-- CATALOGO -->
-  <section id="catalogo">
+  <section id="catalogo" class="light">
     <div class="wrap">
       <div class="section-head">
         <div class="section-label">Catálogo por perfume</div>
@@ -548,7 +561,7 @@
   </section>
 </main>
 
-<footer>
+<footer class="light">
   <svg class="foot-watermark" viewBox="0 0 220 320" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <rect x="62" y="86" width="96" height="200" rx="16" fill="none" stroke="#c9a227" stroke-width="2"/>
     <text x="110" y="215" text-anchor="middle" font-family="Fraunces, serif" font-size="46" letter-spacing="-1" fill="#c9a227" font-weight="600">M&amp;A</text>
@@ -582,7 +595,7 @@
 </footer>
 
 <!-- DETALLE DE PERFUME -->
-<div class="pd-modal" id="pd-modal" aria-hidden="true">
+<div class="pd-modal light" id="pd-modal" aria-hidden="true">
   <div class="pd-backdrop" id="pd-backdrop"></div>
   <div class="pd-box" role="dialog" aria-modal="true" aria-labelledby="pd-name">
     <button type="button" class="pd-close" id="pd-close" aria-label="Cerrar">&times;</button>

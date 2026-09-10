@@ -176,6 +176,50 @@
   }
   .reco-clear:hover{border-color:var(--gold);color:var(--ink);}
 
+  /* ---------- Product detail modal ---------- */
+  .pd-modal{
+    position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+    padding:20px;
+  }
+  .pd-modal.open{display:flex;}
+  .pd-backdrop{position:absolute;inset:0;background:rgba(10,7,12,0.8);backdrop-filter:blur(4px);}
+  .pd-box{
+    position:relative;background:var(--bg-panel);border:1px solid var(--line);border-radius:18px;
+    max-width:780px;width:100%;max-height:88vh;overflow:hidden;
+    display:grid;grid-template-columns:1fr 1fr;align-items:start;
+    box-shadow:0 24px 64px rgba(0,0,0,0.5);
+  }
+  .pd-photo{width:100%;aspect-ratio:1/1;background-color:var(--bg-panel-alt);}
+  .pd-info{padding:34px;display:flex;flex-direction:column;overflow-y:auto;max-height:88vh;}
+  .pd-tag{font-size:12.5px;color:var(--gold-bright);font-weight:700;margin-bottom:10px;display:block;}
+  .pd-info h3{font-family:var(--serif);font-size:25px;font-weight:600;margin-bottom:8px;line-height:1.22;}
+  .pd-meta{font-size:13.5px;color:var(--ink-faint);margin-bottom:18px;}
+  .pd-desc{font-size:14.5px;color:var(--ink-dim);line-height:1.65;margin-bottom:24px;}
+  .pd-price{font-size:23px;font-weight:800;color:var(--ink);margin-top:auto;margin-bottom:20px;}
+  .pd-close{
+    position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;
+    background:var(--bg-panel-alt);border:1px solid var(--line);color:var(--ink);
+    font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    z-index:2;transition:border-color .15s ease, color .15s ease;
+  }
+  .pd-close:hover{border-color:var(--gold);color:var(--gold-bright);}
+  @media (max-width:640px){
+    .pd-box{grid-template-columns:1fr;max-height:92vh;overflow-y:auto;}
+    .pd-photo{aspect-ratio:1/1;min-height:0;}
+    .pd-info{overflow-y:visible;max-height:none;}
+  }
+
+  /* Hover hint on clickable photos */
+  .p-photo, .cat-card-photo{position:relative;cursor:pointer;}
+  .p-photo::after, .cat-card-photo::after{
+    content:"Ver detalles";position:absolute;inset:auto 0 0 0;text-align:center;
+    background:linear-gradient(transparent, rgba(10,7,12,0.65));color:var(--ink);
+    font-size:12px;font-weight:700;padding:28px 8px 10px;opacity:0;
+    transition:opacity .15s ease;border-radius:0 0 8px 8px;
+  }
+  .cat-card-photo::after{border-radius:0 0 10px 10px;}
+  .p-photo:hover::after, .cat-card-photo:hover::after{opacity:1;}
+
   /* ---------- Featured strip ---------- */
   .strip-scroll{
     display:flex;gap:22px;overflow-x:auto;padding:8px 4px 20px;margin:0 -4px;
@@ -537,6 +581,23 @@
   </div>
 </footer>
 
+<!-- DETALLE DE PERFUME -->
+<div class="pd-modal" id="pd-modal" aria-hidden="true">
+  <div class="pd-backdrop" id="pd-backdrop"></div>
+  <div class="pd-box" role="dialog" aria-modal="true" aria-labelledby="pd-name">
+    <button type="button" class="pd-close" id="pd-close" aria-label="Cerrar">&times;</button>
+    <div class="pd-photo" id="pd-photo" role="img"></div>
+    <div class="pd-info">
+      <span class="pd-tag" id="pd-tag"></span>
+      <h3 id="pd-name"></h3>
+      <div class="pd-meta" id="pd-meta"></div>
+      <p class="pd-desc" id="pd-desc"></p>
+      <div class="pd-price" id="pd-price"></div>
+      <a href="#" id="pd-wa" class="btn btn-gold" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+    </div>
+  </div>
+</div>
+
 <script src="assets/data/products.js"></script>
 <script>
 /* ================= LOGO (nav) ================= */
@@ -634,7 +695,7 @@ function renderFeatured(){
   const picks = seededPick(PRODUCTS, 6, dayNum);
   document.getElementById('featured-strip').innerHTML = picks.map((p)=>`
     <div class="p-card">
-      <div class="p-photo" style="${photoStyle(p)}" role="img" aria-label="${p.name}"></div>
+      <div class="p-photo" style="${photoStyle(p)}" role="img" aria-label="Ver detalles de ${p.name}" data-pidx="${PRODUCTS.indexOf(p)}"></div>
       <span class="p-tag">${p.tag}</span>
       <div class="p-name">${p.name}</div>
       <div class="p-price">${formatPrice(p.dop)} <small>${p.cat}</small></div>
@@ -646,7 +707,7 @@ function renderFeatured(){
 function catalogCardHTML(p){
   return `
     <div class="cat-card">
-      <div class="cat-card-photo" style="${photoStyle(p)}" role="img" aria-label="${p.name}"></div>
+      <div class="cat-card-photo" style="${photoStyle(p)}" role="img" aria-label="Ver detalles de ${p.name}" data-pidx="${PRODUCTS.indexOf(p)}"></div>
       <span class="cat-card-tag">${p.tag}</span>
       <div class="cat-card-name">${p.name}</div>
       <div class="cat-card-meta">${p.cat}${p.size ? ' · ' + p.size : ''}</div>
@@ -679,6 +740,58 @@ function renderCatalog(){
 document.getElementById('cat-search').addEventListener('input', renderCatalog);
 document.getElementById('cat-filter').addEventListener('change', renderCatalog);
 document.getElementById('cat-tag-filter').addEventListener('change', renderCatalog);
+
+/* ================= DETALLE DE PERFUME (clic en la foto) ================= */
+const STYLE_DESCRIPTIONS = {
+  Fresco: "un aroma fresco y luminoso, con salida cítrica o acuática que lo hace fácil de llevar en el día a día y en la oficina",
+  Dulce: "una fragancia dulce y envolvente, con notas golosas que la hacen ideal para citas y salidas nocturnas",
+  Elegante: "una composición elegante y refinada, pensada para looks cuidados, reuniones importantes y ocasiones especiales",
+  Intenso: "una fragancia intensa y con carácter, de proyección fuerte y larga duración, perfecta para la noche",
+  Amaderado: "una base amaderada cálida y envolvente, con un fondo seco y sofisticado que deja estela",
+  'Árabe': "una fragancia inspirada en la perfumería árabe, con oud, especias y resinas que dejan una estela muy duradera",
+};
+const CAT_DESCRIPTIONS = {
+  Hombre: "Pensado para hombre.",
+  Mujer: "Pensado para mujer.",
+  Unisex: "Una fragancia unisex, pensada para cualquiera.",
+};
+function descriptionFor(p){
+  const style = STYLE_DESCRIPTIONS[p.tag] || "una fragancia cuidadosamente seleccionada para nuestro catálogo";
+  const catLine = CAT_DESCRIPTIONS[p.cat] || "";
+  const sizeLine = p.size ? ` Presentación de ${p.size}.` : "";
+  return `${p.name} es ${style}. ${catLine}${sizeLine} Perfume original bajo pedido: te confirmamos disponibilidad y precio final por WhatsApp antes de coordinar la entrega.`;
+}
+
+function openProductDetail(p){
+  document.getElementById('pd-photo').setAttribute('style', photoStyle(p));
+  document.getElementById('pd-tag').textContent = p.tag;
+  document.getElementById('pd-name').textContent = p.name;
+  document.getElementById('pd-meta').textContent = `${p.cat}${p.size ? ' · ' + p.size : ''}`;
+  document.getElementById('pd-desc').textContent = descriptionFor(p);
+  document.getElementById('pd-price').textContent = formatPrice(p.dop);
+  document.getElementById('pd-wa').href = `https://wa.me/${getWaNumber()}?text=${encodeURIComponent('Hola MeryanShop, me interesa: ' + p.name)}`;
+  const modal = document.getElementById('pd-modal');
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+function closeProductDetail(){
+  const modal = document.getElementById('pd-modal');
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+document.body.addEventListener('click', (e)=>{
+  const photo = e.target.closest('[data-pidx]');
+  if(!photo) return;
+  const p = PRODUCTS[Number(photo.dataset.pidx)];
+  if(p) openProductDetail(p);
+});
+document.getElementById('pd-close').addEventListener('click', closeProductDetail);
+document.getElementById('pd-backdrop').addEventListener('click', closeProductDetail);
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape') closeProductDetail();
+});
 
 /* ================= RECOMMENDER ================= */
 const selections = { quien:null, ocasion:null, estilo:null, presupuesto:null };

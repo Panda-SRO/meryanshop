@@ -174,7 +174,7 @@
   }
   .p-card:nth-child(even){margin-top:22px;}
   .p-bottle{width:64px;height:86px;margin-bottom:16px;}
-  .p-photo{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;margin-bottom:16px;}
+  .p-photo{width:100%;aspect-ratio:1/1;border-radius:8px;margin-bottom:16px;background-color:var(--bg-panel-alt);}
   .p-name{font-family:var(--serif);font-size:17px;font-weight:600;margin-bottom:4px;}
   .p-tag{font-size:12px;color:var(--gold-bright);font-weight:700;margin-bottom:12px;display:block;}
   .p-price{font-size:15px;font-weight:800;color:var(--ink);}
@@ -216,7 +216,7 @@
     padding:16px 4px;border-bottom:1px solid var(--line);
   }
   .cat-row .p-bottle{width:28px;height:38px;margin:0;}
-  .cat-row-photo{width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;}
+  .cat-row-photo{width:40px;height:40px;border-radius:6px;flex-shrink:0;background-color:var(--bg-panel-alt);}
   .cat-row-name{font-size:15px;font-weight:700;}
   .cat-row-tag{font-size:12px;color:var(--ink-faint);}
   .cat-row-price{font-size:14.5px;font-weight:800;white-space:nowrap;}
@@ -292,7 +292,7 @@
           <a href="#catalogo" class="btn btn-ghost">Ver catálogo</a>
         </div>
         <div class="hero-stats">
-          <div><strong>+30</strong>fragancias activas</div>
+          <div><strong id="stat-count">+420</strong>fragancias activas</div>
           <div><strong>3</strong>monedas de referencia</div>
           <div><strong>1–2 días</strong>de coordinación de entrega</div>
         </div>
@@ -489,6 +489,7 @@
   </div>
 </footer>
 
+<script src="assets/data/products.js"></script>
 <script>
 /* ================= LOGO (nav) ================= */
 document.getElementById('logo-top').innerHTML = `
@@ -500,35 +501,26 @@ document.getElementById('logo-top').innerHTML = `
 `;
 
 /* ================= DATA ================= */
-// Precio base en USD. Ajusta estos valores y agrega tantos productos como necesites.
-const PRODUCTS = [
-  {name:"Ámbar Nocturno", cat:"Hombre", tag:"Amaderado", usd:42},
-  {name:"Brisa Cítrica", cat:"Hombre", tag:"Fresco", usd:35},
-  {name:"Oud Imperial", cat:"Hombre", tag:"Árabe", usd:58},
-  {name:"Cedro Real", cat:"Hombre", tag:"Intenso", usd:46},
-  {name:"Flor de Tuberosa", cat:"Mujer", tag:"Dulce", usd:44},
-  {name:"Vainilla Negra", cat:"Mujer", tag:"Dulce", usd:39},
-  {name:"Rosa de Medianoche", cat:"Mujer", tag:"Elegante", usd:52},
-  {name:"Jazmín Blanco", cat:"Mujer", tag:"Fresco", usd:37},
-  {name:"Almizcle Dorado", cat:"Unisex", tag:"Elegante", usd:48},
-  {name:"Sal y Sándalo", cat:"Unisex", tag:"Amaderado", usd:41},
-  {name:"Incienso Árabe", cat:"Unisex", tag:"Árabe", usd:55},
-  {name:"Higuera Verde", cat:"Unisex", tag:"Fresco", usd:33},
-  {name:"Cuero y Tabaco", cat:"Hombre", tag:"Intenso", usd:50},
-  {name:"Pétalo de Seda", cat:"Mujer", tag:"Elegante", usd:47},
-  {name:"Bergamota Real", cat:"Unisex", tag:"Fresco", usd:36},
-];
-// Cada producto puede traer su propia foto: agrega  img: "assets/img/mi-foto.jpg"
-// dentro del objeto del producto. Si no la agregas, se usa una imagen de
-// referencia según el estilo (assets/img/placeholder-<estilo>.jpg).
-function slugTag(tag){
-  return tag.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+// Catálogo completo (420 productos) cargado desde assets/data/products.js
+const PRODUCTS = window.PRODUCTS || [];
+document.getElementById('stat-count').textContent = '+' + PRODUCTS.length;
+// Cada producto tiene page/slot: ubica su foto real dentro de uno de los
+// 4 mosaicos assets/img/catalogo-N.webp (mismo catálogo fotográfico de siempre).
+function visualFor(p){
+  const block = p.page <= 9 ? 1 : p.page <= 18 ? 2 : p.page <= 27 ? 3 : 4;
+  const start = block === 1 ? 1 : block === 2 ? 10 : block === 3 ? 19 : 28;
+  const col = p.slot % 3;
+  const row = Math.floor(p.slot / 3);
+  const globalRow = (p.page - start) * 4 + row;
+  return { image: `assets/img/catalogo-${block}.webp`, position: `${col * 50}% ${globalRow * 2.825}%` };
 }
-function imageFor(p){
-  return p.img || `assets/img/placeholder-${slugTag(p.tag)}.svg`;
+function photoStyle(p){
+  const v = visualFor(p);
+  return `background-image:url('${v.image}');background-position:${v.position};background-size:300% auto;background-repeat:no-repeat;`;
 }
 
-// Tasas de referencia (aproximadas). Actualízalas antes de publicar.
+// Precio maestro en RD$ (pesos dominicanos, moneda real del negocio).
+// Tasas de referencia frente al dólar (aproximadas). Actualízalas antes de publicar.
 const RATES = { USD: 1, DOP: 60, CLP: 950 };
 const SYMBOLS = { USD: "US$", DOP: "RD$", CLP: "CLP$" };
 let currentCurrency = "USD";
@@ -537,23 +529,46 @@ let currentCurrency = "USD";
 const WA_NUMBERS = { USD: "18496548098", DOP: "18496548098", CLP: "56991565317" };
 function getWaNumber(){ return WA_NUMBERS[currentCurrency]; }
 
-function formatPrice(usd){
+function formatPrice(dop){
+  if(currentCurrency === "DOP"){
+    return `RD$ ${Math.round(dop).toLocaleString('es-DO')}`;
+  }
+  const usd = dop / RATES.DOP;
   const value = usd * RATES[currentCurrency];
   const rounded = currentCurrency === "USD" ? value.toFixed(2) : Math.round(value).toLocaleString('es-DO');
   return `${SYMBOLS[currentCurrency]} ${rounded}`;
+}
+
+function setCurrency(cur){
+  currentCurrency = cur;
+  document.querySelectorAll('#currency-pill button').forEach(b=>b.classList.toggle('active', b.dataset.cur === cur));
+  renderFeatured();
+  renderCatalog();
+  updateWhatsappLink();
+  updateFooterWhatsapp();
 }
 
 /* ================= CURRENCY SWITCH ================= */
 document.getElementById('currency-pill').addEventListener('click', (e)=>{
   const btn = e.target.closest('button[data-cur]');
   if(!btn) return;
-  currentCurrency = btn.dataset.cur;
-  document.querySelectorAll('#currency-pill button').forEach(b=>b.classList.toggle('active', b===btn));
-  renderFeatured();
-  renderCatalog();
-  updateWhatsappLink();
-  updateFooterWhatsapp();
+  setCurrency(btn.dataset.cur);
 });
+
+/* ================= CURRENCY AUTO-DETECT (por país del visitante) ================= */
+async function detectCurrencyByCountry(){
+  try{
+    const res = await fetch('https://ipapi.co/json/');
+    if(!res.ok) return;
+    const data = await res.json();
+    const code = data && data.country_code;
+    const byCountry = { DO: "DOP", CL: "CLP", US: "USD" };
+    const detected = byCountry[code];
+    if(detected) setCurrency(detected);
+  }catch(err){
+    // Sin geolocalización disponible (bloqueada, sin red, etc.): se mantiene USD por defecto.
+  }
+}
 
 /* ================= FEATURED (rota por día) ================= */
 function seededPick(list, n, seed){
@@ -571,10 +586,10 @@ function renderFeatured(){
   const picks = seededPick(PRODUCTS, 6, dayNum);
   document.getElementById('featured-strip').innerHTML = picks.map((p)=>`
     <div class="p-card">
-      <img class="p-photo" src="${imageFor(p)}" alt="${p.name}" loading="lazy">
+      <div class="p-photo" style="${photoStyle(p)}" role="img" aria-label="${p.name}"></div>
       <span class="p-tag">${p.tag}</span>
       <div class="p-name">${p.name}</div>
-      <div class="p-price">${formatPrice(p.usd)} <small>${p.cat}</small></div>
+      <div class="p-price">${formatPrice(p.dop)} <small>${p.cat}</small></div>
     </div>
   `).join('');
 }
@@ -594,12 +609,12 @@ function renderCatalog(){
   } else {
     listEl.innerHTML = list.map((p)=>`
       <div class="cat-row">
-        <img class="cat-row-photo" src="${imageFor(p)}" alt="${p.name}" loading="lazy">
+        <div class="cat-row-photo" style="${photoStyle(p)}" role="img" aria-label="${p.name}"></div>
         <div>
           <div class="cat-row-name">${p.name}</div>
-          <div class="cat-row-tag">${p.cat} · ${p.tag}</div>
+          <div class="cat-row-tag">${p.cat} · ${p.tag}${p.size ? ' · ' + p.size : ''}</div>
         </div>
-        <div class="cat-row-price">${formatPrice(p.usd)}</div>
+        <div class="cat-row-price">${formatPrice(p.dop)}</div>
         <a class="cat-row-wa" href="https://wa.me/${getWaNumber()}?text=${encodeURIComponent('Hola MeryanShop, me interesa: ' + p.name)}" target="_blank" rel="noopener" aria-label="Preguntar por WhatsApp">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.35 5.08L2 22l5.1-1.33A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.1-.44-4.38-1.2l-.31-.19-3.03.8.81-2.95-.2-.31A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8z"/></svg>
         </a>
@@ -647,6 +662,7 @@ updateFooterWhatsapp();
 /* ================= INIT ================= */
 renderFeatured();
 renderCatalog();
+detectCurrencyByCountry();
 </script>
 </body>
 </html>
